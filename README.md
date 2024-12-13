@@ -18,6 +18,23 @@ Note Manager is an application designed to efficiently manage notes and categori
 - **MongoDB Atlas**
 - **JavaScript**
 
+## Prerequisites 
+Make sure you have the following installed: 
+- Node.js (recommended version: 14.x or higher)
+- Yarn (package manager)
+## Installation and Setup
+  Follow these steps to install and set up the project:
+  
+1. Clone the repository:
+   - ```bash git clone https://github.com/Vctorqui/full_stack_exercise.git ```
+   - ```bash cd full_stack_exercise ```
+
+2. Ensure the `start-app.sh` script has execution permissions:
+   ```bash chmod +x start-app.sh ```
+   
+3. Run the start script to install dependencies and start the servers:
+   - ```bash ./start-app.sh ```
+
 ## Main Features
 
 - Create, edit, and delete notes.
@@ -45,14 +62,14 @@ Note Manager is an application designed to efficiently manage notes and categori
   {
     "title": "string",
     "content": "string",
-    "categoryId": "string"
+    "categories": []
   }
   ```
   | Parameter    | Type     | Description                               |
   | :----------- | :------- | :---------------------------------------- |
   | `title`      | `string` | **Required**. Title of the note.          |
   | `content`    | `string` | **Required**. Content of the note.        |
-  | `categoryId` | `string` | **Required**. ID of the related category. |
+  | `categories` | `array` | **Optional**. ID of the related category. |
 
 #### Update a note
 
@@ -66,15 +83,15 @@ Note Manager is an application designed to efficiently manage notes and categori
   {
     "title": "string",
     "content": "string",
-    "categoryId": "string"
+    "categories": []
   }
   ```
   | Parameter    | Type     | Description                                |
   | :----------- | :------- | :----------------------------------------- |
-  | `id`         | `string` | **Required**. ID of the note to update.    |
+  | `_id`         | `string` | **Required**. ID of the note to update.    |
   | `title`      | `string` | **Optional**. Updated title of the note.   |
   | `content`    | `string` | **Optional**. Updated content of the note. |
-  | `categoryId` | `string` | **Optional**. Updated category ID.         |
+  | `categories` | `array` | **Optional**. Updated category ID.         |
 
 #### Delete a note
 
@@ -86,7 +103,7 @@ Note Manager is an application designed to efficiently manage notes and categori
 
   | Parameter | Type     | Description                             |
   | :-------- | :------- | :-------------------------------------- |
-  | `id`      | `string` | **Required**. ID of the note to delete. |
+  | `_id`      | `string` | **Required**. ID of the note to delete. |
 
 ### Categories
 
@@ -104,12 +121,14 @@ Note Manager is an application designed to efficiently manage notes and categori
 - **Required Body:**
   ```json
   {
-    "name": "string"
+    "name": "string",
+    "color": "string"
   }
   ```
   | Parameter | Type     | Description                         |
   | :-------- | :------- | :---------------------------------- |
   | `name`    | `string` | **Required**. Name of the category. |
+  | `color`    | `string` | **Required**. Color of the category. |
 
 #### Delete a category
 
@@ -121,18 +140,13 @@ Note Manager is an application designed to efficiently manage notes and categori
 
   | Parameter | Type     | Description                                 |
   | :-------- | :------- | :------------------------------------------ |
-  | `id`      | `string` | **Required**. ID of the category to delete. |
+  | `_id`      | `string` | **Required**. ID of the category to delete. |
 
 ## Usage / Examples
 
 ### Zustand Example: Global State Management for Categories
 
 ```typescript
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
-import { Category } from '../types/types'
-import { deleteApiCategory, getApiCategories } from '@/services/categoryService'
-
 interface CategoryState {
   categories: Category[]
   fetchCategories: () => Promise<void>
@@ -163,44 +177,156 @@ export const useStore = create<CategoryState>()(
 )
 ```
 
-### Material UI Example: Stylized Input Component
+### Material UI Example: Custom Input Component
 
 ```typescript
-import { FormControl, TextField, styled } from '@mui/material'
+interface validationTypes {
+  validate: () => boolean
+  msg: string
+}
 
-const StyledFormControl = styled(FormControl)(({ theme }) => ({
-  margin: theme.spacing(2, 0),
-}))
+interface FancyInputTypes extends StandardTextFieldProps {
+  validation?: validationTypes[]
+  onlyNumber?: boolean
+  maxLength?: number
+  validateSubmit?: boolean
+  mb?: number
+}
 
-export const StylizedInput = ({ label, value, onChange }) => (
-  <StyledFormControl fullWidth>
-    <TextField
-      label={label}
-      value={value}
-      onChange={onChange}
-      variant='outlined'
-    />
-  </StyledFormControl>
-)
-```
+export function isValidEmail(email: string) {
+  return /\S+@\S+\.\S+/.test(email)
+}
 
-### Next.js API Route Example
+const CustomInput = ({
+  label,
+  name,
+  value,
+  variant,
+  required,
+  validation,
+  type,
+  multiline,
+  helperText,
+  onChange,
+  maxLength,
+  validateSubmit,
+  mb,
+  ...rest
+}: FancyInputTypes) => {
+  const [touched, setTouched] = useState(false)
 
-```typescript
-// pages/api/categories.ts
-import { NextApiRequest, NextApiResponse } from 'next'
+  const isNumber = () => type === 'number'
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  if (req.method === 'GET') {
-    // Fetch categories logic here
-    res.status(200).json({ categories: [] })
-  } else {
-    res.setHeader('Allow', ['GET'])
-    res.status(405).end(`Method ${req.method} Not Allowed`)
+  const isEmptyString = (str: string) => {
+    return str === ''
   }
+
+  const stringIsOnlyDigits = (str: string) => {
+    return /^[0-9]+([.])?([0-9]+)?$/.test(str)
+  }
+
+  const onChangeCustom = (e: ChangeEvent<HTMLInputElement>) => {
+    setTouched(true)
+    if (
+      isNumber() &&
+      !isEmptyString(e.target.value) &&
+      !stringIsOnlyDigits(e.target.value)
+    )
+      return
+    if (onChange) onChange(e)
+  }
+
+  const getMessageError = () => {
+    if (validation) {
+      for (const v of validation) {
+        if (!v.validate()) return v.msg
+      }
+      return ''
+    }
+  }
+
+  const requiredCondition = (touched || validateSubmit) && !value && required
+  const showCustomError =
+    (touched || validateSubmit) && validation && !!getMessageError()
+  const hasError = requiredCondition || showCustomError
+
+  return (
+    <>
+      <FormControl fullWidth error={hasError}>
+        <TextField
+          label={label}
+          style={mb !== undefined ? { marginBottom: mb } : { marginBottom: 10 }}
+          size='small'
+          error={hasError}
+          helperText={
+            requiredCondition
+              ? '* Required'
+              : showCustomError
+              ? getMessageError()
+              : helperText ?? ''
+          }
+          variant={variant ? variant : 'outlined'}
+          name={name}
+          multiline={multiline}
+          value={value}
+          onChange={onChangeCustom}
+          slotProps={{
+            input: {
+              className: required ? 'textField-required' : '',
+            },
+            htmlInput: {
+              maxLength: maxLength,
+              style: multiline
+                ? {
+                    backgroundColor: 'transparent',
+                    borderRadius: 4,
+                    margin: '-8.5px -14px',
+                    padding: '8.5px 14px',
+                  }
+                : {
+                    backgroundColor: 'transparent',
+                    borderRadius: 4,
+                  },
+              autoComplete: 'off',
+              form: {
+                autoComplete: 'off',
+              },
+            },
+          }}
+          {...rest}
+        />
+      </FormControl>
+    </>
+  )
+}
+
+export default CustomInput
+```
+- Validate inputs and give an error message.
+
+### Next.js Base Services
+
+```typescript
+export async function fetchApi<T>(
+  url: string,
+  options: RequestInit = {}
+): Promise<T> {
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(`API Error: ${response.statusText}`)
+  }
+  const data = await response.json()
+  console.log(data)
+  return data
 }
 ```
 
@@ -214,7 +340,7 @@ curl -X POST http://localhost:3000/api/notes \
   -d '{
     "title": "My first note",
     "content": "This is the content of my note",
-    "categoryId": "64a3bc2ef"
+    "categories": ["64a3bc2ef"]
   }'
 ```
 
@@ -232,7 +358,7 @@ curl -X PUT http://localhost:3000/api/notes/64a3bc2ef \
   -d '{
     "title": "Updated note",
     "content": "Updated content",
-    "categoryId": "64a3bc2ef"
+    "categories": ["64a3bc2ef"]
   }'
 ```
 
@@ -260,5 +386,3 @@ curl -X DELETE http://localhost:3000/api/notes/64a3bc2ef
 - **Víctor Quiñones**
 
 ---
-
-> Note: The installation section will be added later once the Bash installation command is defined.
