@@ -16,6 +16,5 @@ export async function fetchApi<T>(
     throw new Error(`API Error: ${response.statusText}`)
   }
   const data = await response.json()
-  console.log(data)
   return data
 }
