@@ -1,17 +1,27 @@
 import notesModel from '../models/notes.model.js'
 
-// Obtener todas las notas
+// GET all notes
 export const getNotes = async (req, res) => {
   try {
     const notes = await notesModel.find({}).populate('categories', 'name color')
-    // res.status(200).json(notes)
     res.send(notes)
   } catch (error) {
     res.status(500).json({ message: error.message })
   }
 }
 
-// Crear una nueva nota
+// GET notes by ID
+export const getNoteById = async (req, res) => {
+  try {
+    const note = await notesModel.findById(req.params.id)
+    if (!note) return res.status(404).json({ message: 'Nota Not found' })
+    res.send(note)
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
+// POST create a note
 export const createNote = async (req, res) => {
   const { title, content, categories } = req.body
 
@@ -29,18 +39,7 @@ export const createNote = async (req, res) => {
   }
 }
 
-// Obtener una nota por ID
-export const getNoteById = async (req, res) => {
-  try {
-    const note = await notesModel.findById(req.params.id)
-    if (!note) return res.status(404).json({ message: 'Nota no encontrada' })
-    res.send(note)
-  } catch (error) {
-    res.status(500).json({ message: error.message })
-  }
-}
-
-// Actualizar una nota por ID
+// PUT updated a note by ID
 export const updateNote = async (req, res) => {
   try {
     const updatedNote = await notesModel.findByIdAndUpdate(
@@ -50,20 +49,18 @@ export const updateNote = async (req, res) => {
         new: true,
       }
     )
-    if (!updatedNote)
-      return res.status(404).json({ message: 'Nota no encontrada' })
+    if (!updatedNote) return res.status(404).json({ message: 'Nota Not found' })
     res.send(updatedNote)
   } catch (error) {
     res.status(500).json({ message: error.message })
   }
 }
 
-// Eliminar una nota por ID
+// DELETE note by ID
 export const deleteNote = async (req, res) => {
   try {
     const deletedNote = await notesModel.findByIdAndDelete(req.params.id)
-    if (!deletedNote)
-      return res.status(404).json({ message: 'Nota no encontrada' })
+    if (!deletedNote) return res.status(404).json({ message: 'Nota Not found' })
     res.send(deletedNote)
   } catch (error) {
     res.status(500).json({ message: error.message })
