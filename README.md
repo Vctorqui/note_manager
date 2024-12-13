@@ -198,9 +198,6 @@ export const useStore = create<CategoryState>()(
   )
 )
 ```
-
-- Validate inputs and give an error message.
-
 ### Next.js Base Services
 
 ```typescript
