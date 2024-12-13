@@ -1,4 +1,4 @@
-# Note Manager
+# Note Manager _(fullstack exercise)_
 
 Note Manager is an application designed to efficiently manage notes and categories. It allows you to create, edit, and delete notes, filter them by categories, and easily manage categories.
 
