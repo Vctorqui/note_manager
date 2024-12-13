@@ -18,22 +18,44 @@ Note Manager is an application designed to efficiently manage notes and categori
 - **MongoDB Atlas**
 - **JavaScript**
 
-## Prerequisites 
-Make sure you have the following installed: 
+## Prerequisites
+
+Make sure you have the following installed:
+
 - Node.js (recommended version: 14.x or higher)
 - Yarn (package manager)
+
+## `.env` Files Configuration
+
+To ensure the security of credentials and the correct setup of the environment, we use `.env.template` files for the backend. These template files should be copied and renamed to `.env`, and then filled with the necessary credentials.
+
+### Steps to Configure `.env` Files
+
+1. **Backend**:
+   - Navigate to the `backend` folder.
+   - Copy the `.env.template` file and rename it to `.env`:
+     ```bash
+     cp backend/.env.template backend/.env
+     ```
+   - Open the `.env` file and add your MongoDB credentials and other necessary values.
+
+### Using the `setup.sh` Script
+
+To facilitate the setup of the environment, we have included a `setup.sh` script that automates the process of verifying and creating `.env` files based on the provided templates. This script also installs the necessary dependencies and sets up the database.
+
 ## Installation and Setup
-  Follow these steps to install and set up the project:
-  
+
+Follow these steps to install and set up the project:
+
 1. Clone the repository:
-   - ```bash git clone https://github.com/Vctorqui/full_stack_exercise.git ```
-   - ```bash cd full_stack_exercise ```
+
+   - `bash git clone https://github.com/Vctorqui/full_stack_exercise.git `
+   - `bash cd full_stack_exercise `
 
 2. Ensure the `start-app.sh` script has execution permissions:
-   ```bash chmod +x start-app.sh ```
-   
+   `bash chmod +x start-app.sh `
 3. Run the start script to install dependencies and start the servers:
-   - ```bash ./start-app.sh ```
+   - `bash ./start-app.sh `
 
 ## Main Features
 
@@ -69,7 +91,7 @@ Make sure you have the following installed:
   | :----------- | :------- | :---------------------------------------- |
   | `title`      | `string` | **Required**. Title of the note.          |
   | `content`    | `string` | **Required**. Content of the note.        |
-  | `categories` | `array` | **Optional**. ID of the related category. |
+  | `categories` | `array`  | **Optional**. ID of the related category. |
 
 #### Update a note
 
@@ -88,10 +110,10 @@ Make sure you have the following installed:
   ```
   | Parameter    | Type     | Description                                |
   | :----------- | :------- | :----------------------------------------- |
-  | `_id`         | `string` | **Required**. ID of the note to update.    |
+  | `_id`        | `string` | **Required**. ID of the note to update.    |
   | `title`      | `string` | **Optional**. Updated title of the note.   |
   | `content`    | `string` | **Optional**. Updated content of the note. |
-  | `categories` | `array` | **Optional**. Updated category ID.         |
+  | `categories` | `array`  | **Optional**. Updated category ID.         |
 
 #### Delete a note
 
@@ -103,7 +125,7 @@ Make sure you have the following installed:
 
   | Parameter | Type     | Description                             |
   | :-------- | :------- | :-------------------------------------- |
-  | `_id`      | `string` | **Required**. ID of the note to delete. |
+  | `_id`     | `string` | **Required**. ID of the note to delete. |
 
 ### Categories
 
@@ -125,10 +147,10 @@ Make sure you have the following installed:
     "color": "string"
   }
   ```
-  | Parameter | Type     | Description                         |
-  | :-------- | :------- | :---------------------------------- |
-  | `name`    | `string` | **Required**. Name of the category. |
-  | `color`    | `string` | **Required**. Color of the category. |
+  | Parameter | Type     | Description                          |
+  | :-------- | :------- | :----------------------------------- |
+  | `name`    | `string` | **Required**. Name of the category.  |
+  | `color`   | `string` | **Required**. Color of the category. |
 
 #### Delete a category
 
@@ -140,7 +162,7 @@ Make sure you have the following installed:
 
   | Parameter | Type     | Description                                 |
   | :-------- | :------- | :------------------------------------------ |
-  | `_id`      | `string` | **Required**. ID of the category to delete. |
+  | `_id`     | `string` | **Required**. ID of the category to delete. |
 
 ## Usage / Examples
 
@@ -302,6 +324,7 @@ const CustomInput = ({
 
 export default CustomInput
 ```
+
 - Validate inputs and give an error message.
 
 ### Next.js Base Services

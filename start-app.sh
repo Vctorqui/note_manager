@@ -23,15 +23,12 @@ if [ -d "$BACKEND_DIR" ]; then
     echo -e "${GREEN}Backend directory found...${NC}"
     cd "$BACKEND_DIR"
 
-    # 2. Check if .env exists in the backend
+    # Check if .env exists in the backend
     if [ ! -f .env ]; then
-        echo -e "${GREEN}Creating .env file for the backend...${NC}"
-        cat <<EOL >.env
-PORT=3001
-MONGODB_CONNECTION_URL=mongodb+srv://shared-user:EKJjPpUnuh82wD7y@cluster0.cuwz1.mongodb.net/develop?retryWrites=true&w=majority&appName=Cluster0
-FRONTEND_URL=http://localhost:3000
-EOL
-        echo -e "${GREEN}.env file created successfully.${NC}"
+        echo -e "${GREEN}Creating .env file for the backend from template...${NC}"
+        cp .env.template .env
+        echo -e "${GREEN}.env file created successfully from template. Please update it with your credentials.${NC}" else
+        echo -e "${GREEN}.env file exists.${NC}"
     fi
 
     # 3. Install backend dependencies
