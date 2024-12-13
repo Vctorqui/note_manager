@@ -15,14 +15,14 @@ export const getCategoryById = async (req, res) => {
   try {
     const category = await categoryModel.findById(req.params.id)
     if (!category)
-      return res.status(404).json({ message: 'Categoría no encontrada' })
+      return res.status(404).json({ message: 'Category not found' })
     res.send(category)
   } catch (error) {
     res.status(500).json({ message: error.message })
   }
 }
 
-// PUT create categories
+// POST create categories
 export const createCategory = async (req, res) => {
   const { name, color } = req.body
 
@@ -44,7 +44,7 @@ export const deleteCategory = async (req, res) => {
   try {
     const deletedCategory = await categoryModel.findByIdAndDelete(req.params.id)
     if (!deletedCategory)
-      return res.status(404).json({ message: 'Categoria no encontrada' })
+      return res.status(404).json({ message: 'Category not found' })
     res.send(deletedCategory)
   } catch (error) {
     res.status(500).json({ message: error.message })
