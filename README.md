@@ -229,7 +229,7 @@ export async function fetchApi<T>(
 #### Create a note
 
 ```bash
-curl -X POST http://localhost:3000/api/notes \
+curl -X POST http://localhost:3001/api/notes \
   -H "Content-Type: application/json" \
   -d '{
     "title": "My first note",
@@ -241,13 +241,13 @@ curl -X POST http://localhost:3000/api/notes \
 #### Get all notes
 
 ```bash
-curl -X GET http://localhost:3000/api/notes
+curl -X GET http://localhost:3001/api/notes
 ```
 
 #### Update a note
 
 ```bash
-curl -X PUT http://localhost:3000/api/notes/64a3bc2ef \
+curl -X PUT http://localhost:3001/api/notes/64a3bc2ef \
   -H "Content-Type: application/json" \
   -d '{
     "title": "Updated note",
@@ -259,7 +259,7 @@ curl -X PUT http://localhost:3000/api/notes/64a3bc2ef \
 #### Delete a note
 
 ```bash
-curl -X DELETE http://localhost:3000/api/notes/64a3bc2ef
+curl -X DELETE http://localhost:3001/api/notes/64a3bc2ef
 ```
 
 ## Features
