@@ -67,7 +67,7 @@ fi
 echo -e "${GREEN}Iniciando servidores del backend y frontend...${NC}"
 
 # Iniciar backend en una terminal separada
-gnome-terminal -- bash -c "cd $BACKEND_DIR && yarn start; exec bash" || {
+gnome-terminal -- bash -c "cd $BACKEND_DIR && yarn start:dev; exec bash" || {
     echo -e "${RED}Error iniciando el backend.${NC}"
     exit 1
 }
