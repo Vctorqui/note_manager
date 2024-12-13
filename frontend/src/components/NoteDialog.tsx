@@ -1,29 +1,19 @@
 import {
   Box,
   Button,
-  Checkbox,
   Chip,
   DialogActions,
-  FormControl,
-  FormControlLabel,
-  FormGroup,
-  InputLabel,
-  ListItemText,
-  MenuItem,
-  OutlinedInput,
-  Select,
-  SelectChangeEvent,
   TextField,
   Typography,
 } from '@mui/material'
 import CustomDialog from './ui/CustomDialog'
 import { useEffect, useState } from 'react'
 import { NoteInit } from '../lib/const'
-import { createNote, updateNote } from '@/services/notesService'
-import { Category, Note } from '../types/types'
+import { createNote, updateNote } from '@/src/services/notesService'
+import { Note } from '../types/types'
 import { enqueueSnackbar } from 'notistack'
-import { getApiCategories } from '@/services/categoryService'
 import { useStore } from '../lib/store'
+import CustomInput from './ui/CustomInput'
 
 interface NoteDialogProps {
   open: boolean
@@ -42,12 +32,32 @@ export const NoteDialog = ({
 }: NoteDialogProps) => {
   const [form, setForm] = useState(NoteInit)
   const { categories, fetchCategories } = useStore()
-  // const [availableCategories, setAvailableCategories] = useState<Category[]>([])
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  const [validateInputs, setValidateInputs] = useState(false)
+  const [fieldsWithError, setFieldsWithError] = useState(0)
+  const [loadComponent, setLoadComponent] = useState(0)
+  const [clickSubmit, setClickSubmit] = useState<number>(0)
+
+  useEffect(() => {
+    if (loadComponent > 0 && clickSubmit > 0) {
+      const getAll = document.querySelectorAll('.textField-required.Mui-error')
+      setFieldsWithError(getAll.length)
+      if (getAll.length === 0) {
+        handleAccept()
+      }
+    }
+    setLoadComponent(loadComponent + 1)
+    // eslint-disable-next-line
+  }, [clickSubmit])
+
+  const validateForm = () => {
+    setValidateInputs(true)
+    setClickSubmit(clickSubmit + 1)
+  }
 
   useEffect(() => {
     if (open) {
-      setForm(note || NoteInit) // Actualiza el formulario con los datos de la nota si existe
+      setForm(note || NoteInit)
       setSelectedCategories(
         note
           ? note.categories.map((cat) =>
@@ -58,10 +68,6 @@ export const NoteDialog = ({
       fetchCategories()
     }
   }, [open, note, fetchCategories])
-
-  // useEffect(() => {
-  //  fetchCategories()
-  // }, [fetchCategories])
 
   const handleChange = (event: any) => {
     let { name, value } = event.target
@@ -114,15 +120,21 @@ export const NoteDialog = ({
   return (
     <CustomDialog open={open} onClose={onClose}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 2 }}>
-        <Typography>{note ? 'Edit Note' : 'Create Note'}</Typography>
-        <TextField
+        <Typography variant='h4' textAlign={'center'}>
+          {note ? 'Edit Note' : 'Create Note'}
+        </Typography>
+        <CustomInput
+          required
+          validateSubmit={validateInputs}
           label='Title'
           name='title'
           fullWidth
           value={form.title}
           onChange={handleChange}
         />
-        <TextField
+        <CustomInput
+          required
+          validateSubmit={validateInputs}
           label='Content'
           name='content'
           fullWidth
@@ -155,176 +167,18 @@ export const NoteDialog = ({
         </Box>
       </Box>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={handleAccept} variant='contained'>
+        {fieldsWithError > 0 && loadComponent > 1 && (
+          <Typography variant='body1' color='error' sx={{ margitop: 1 }}>
+            Some fields are empty
+          </Typography>
+        )}
+        <Button variant='contained' color='error' onClick={onClose}>
+          Cancel
+        </Button>
+        <Button onClick={validateForm} variant='contained' color='success'>
           Save
         </Button>
       </DialogActions>
     </CustomDialog>
   )
 }
-
-// async function getCategories() {
-//   try {
-//     const categories = await getApiCategories() // Función para obtener categorías desde la API
-//     setAvailableCategories(categories)
-//   } catch (error) {
-//     console.error('Error fetching categories:', error)
-//   }
-// }
-
-{
-  /* <Box>
-          <Box sx={{ mb: 1 }}>Categories:</Box>
-          <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-            {categories.map((category) => (
-              <Chip
-                key={category.id}
-                label={category.name}
-                onClick={() => toggleCategory(category.id)}
-                color={selectedCategories.includes(category.id)
-                  ? 'primary'
-                  : 'default'}
-                variant={selectedCategories.includes(category.id)
-                  ? 'filled'
-                  : 'outlined'} />
-            ))}
-          </Box>
-        </Box> */
-}
-
-// import { useState, useEffect } from 'react'
-// import { Note, Category } from '../lib/types'
-// import {
-//   Dialog,
-//   DialogTitle,
-//   DialogContent,
-//   DialogActions,
-//   TextField,
-//   Button,
-//   Box,
-//   Chip,
-// } from '@mui/material'
-
-// type CreateNoteData = Omit<Note, 'id' | 'createdAt' | 'updatedAt'>
-// type UpdateNoteData = Partial<Omit<Note, 'id' | 'createdAt' | 'updatedAt'>> & {
-//   id: string
-// }
-
-// interface NoteDialogProps {
-//   note?: Note
-//   open: boolean
-//   onClose: () => void
-//   onSave: (noteData: CreateNoteData | UpdateNoteData) => void
-//   categories: Category[]
-// }
-
-// export function NoteDialog({
-//   note,
-//   open,
-//   onClose,
-//   onSave,
-//   categories,
-// }: NoteDialogProps) {
-//   const [title, setTitle] = useState('')
-//   const [content, setContent] = useState('')
-//   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
-
-//   useEffect(() => {
-//     if (note) {
-//       setTitle(note.title)
-//       setContent(note.content)
-//       setSelectedCategories(note.categories)
-//     } else {
-//       setTitle('')
-//       setContent('')
-//       setSelectedCategories([])
-//     }
-//   }, [note])
-
-//   const handleSubmit = () => {
-//     if (!title.trim() || !content.trim()) return
-
-//     const noteData = {
-//       title,
-//       content,
-//       categories: selectedCategories,
-//     }
-
-//     if (note) {
-//       // Para actualización
-//       onSave({
-//         id: note.id,
-//         ...noteData,
-//       })
-//     } else {
-//       // Para creación
-//       onSave({
-//         ...noteData,
-//         isArchived: false,
-//       })
-//     }
-
-//     onClose()
-//   }
-
-//   const toggleCategory = (categoryId: string) => {
-//     setSelectedCategories((prev) =>
-//       prev.includes(categoryId)
-//         ? prev.filter((id) => id !== categoryId)
-//         : [...prev, categoryId]
-//     )
-//   }
-
-//   return (
-//     <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
-//       <DialogTitle>{note ? 'Edit Note' : 'Create Note'}</DialogTitle>
-//       <DialogContent>
-//         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2 }}>
-//           <TextField
-//             label='Title'
-//             fullWidth
-//             value={title}
-//             onChange={(e) => setTitle(e.target.value)}
-//           />
-//           <TextField
-//             label='Content'
-//             fullWidth
-//             multiline
-//             rows={4}
-//             value={content}
-//             onChange={(e) => setContent(e.target.value)}
-//           />
-//           <Box>
-//             <Box sx={{ mb: 1 }}>Categories:</Box>
-//             <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-//               {categories.map((category) => (
-//                 <Chip
-//                   key={category.id}
-//                   label={category.name}
-//                   onClick={() => toggleCategory(category.id)}
-//                   color={
-//                     selectedCategories.includes(category.id)
-//                       ? 'primary'
-//                       : 'default'
-//                   }
-//                   variant={
-//                     selectedCategories.includes(category.id)
-//                       ? 'filled'
-//                       : 'outlined'
-//                   }
-//                 />
-//               ))}
-//             </Box>
-//           </Box>
-//         </Box>
-//       </DialogContent>
-//       <DialogActions>
-//         <Button onClick={onClose}>Cancel</Button>
-//         <Button onClick={handleSubmit} variant='contained'>
-//           Save
-//         </Button>
-//       </DialogActions>
-//     </Dialog>
-//   )
-// }

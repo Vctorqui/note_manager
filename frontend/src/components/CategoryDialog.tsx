@@ -1,22 +1,12 @@
 import { useEffect, useState } from 'react'
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Button,
-  Box,
-  Typography,
-  Chip,
-} from '@mui/material'
+import { DialogActions, Button, Box, Typography } from '@mui/material'
 import CustomDialog from './ui/CustomDialog'
 import { Category } from '../types/types'
 import { CategoryInit } from '../lib/const'
-import { createCategory } from '@/services/categoryService'
+import { createCategory } from '@/src/services/categoryService'
 import { MuiColorInput } from 'mui-color-input'
-import { useStore } from '../lib/store'
 import { enqueueSnackbar } from 'notistack'
+import CustomInput from './ui/CustomInput'
 
 interface CategoryDialogProps {
   open: boolean
@@ -30,7 +20,27 @@ export function CategoryDialog({
   onCreate,
 }: CategoryDialogProps) {
   const [form, setForm] = useState(CategoryInit)
-  const { categories, fetchCategories, deleteCategory } = useStore()
+  const [loadComponent, setLoadComponent] = useState(0)
+  const [clickSubmit, setClickSubmit] = useState<number>(0)
+  const [fieldsWithError, setFieldsWithError] = useState(0)
+  const [validateInputs, setValidateInputs] = useState(false)
+
+  useEffect(() => {
+    if (loadComponent > 0 && clickSubmit > 0) {
+      const getAll = document.querySelectorAll('.textField-required.Mui-error')
+      setFieldsWithError(getAll.length)
+      if (getAll.length === 0) {
+        handleAccept()
+      }
+    }
+    setLoadComponent(loadComponent + 1)
+    // eslint-disable-next-line
+  }, [clickSubmit])
+
+  const validateForm = () => {
+    setValidateInputs(true)
+    setClickSubmit(clickSubmit + 1)
+  }
 
   const handleChange = (event: any) => {
     let { name, value } = event.target
@@ -43,7 +53,7 @@ export function CategoryDialog({
   const handleColorChange = (color: string) => {
     setForm({
       ...form,
-      color, // Actualiza solo el campo `color` del formulario
+      color,
     })
   }
 
@@ -51,39 +61,36 @@ export function CategoryDialog({
     try {
       const data = await createCategory(form)
       onCreate(data)
-      handleClose() // Cierra y limpia
+      handleClose()
+      enqueueSnackbar('Category Created Successfully', {
+        variant: 'success',
+      })
     } catch (error) {
       console.log(error)
+      enqueueSnackbar('Failed to created the category', { variant: 'error' })
     }
   }
 
   const handleClose = () => {
-    setForm(CategoryInit) // Reinicia el formulario
-    onClose() // Cierra y limpia
+    setForm(CategoryInit)
+    onClose()
   }
 
   useEffect(() => {
     if (open) {
-      setForm(CategoryInit) // Limpia el formulario al abrir el diálogo
+      setForm(CategoryInit)
     }
-    fetchCategories()
   }, [open])
-
-  const handleDeleteCategory = async (categoryId: string) => {
-    try {
-      await deleteCategory(categoryId)
-      enqueueSnackbar('Category deleted successfully', { variant: 'success' })
-    } catch (error) {
-      console.error('Error deleting category:', error)
-      enqueueSnackbar('Failed to delete category', { variant: 'error' })
-    }
-  }
 
   return (
     <CustomDialog open={open} onClose={onClose}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 2 }}>
-        <Typography>Create Category</Typography>
-        <TextField
+        <Typography variant='h4' textAlign={'center'}>
+          Create Category
+        </Typography>
+        <CustomInput
+          required
+          validateSubmit={validateInputs}
           label='Category Name'
           name='name'
           fullWidth
@@ -97,48 +104,20 @@ export function CategoryDialog({
           value={form.color}
           onChange={handleColorChange}
         />
-
-        <Typography>Delete Category</Typography>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 2,
-            flexWrap: 'wrap',
-          }}
-        >
-          {categories.map((category, index) => (
-            <Chip
-              key={category._id + index}
-              label={category.name}
-              onDelete={() => {
-                handleDeleteCategory(category?._id), handleClose()
-              }}
-              sx={{ borderColor: category.color }}
-              variant={'outlined'}
-            />
-          ))}
-        </Box>
       </Box>
       <DialogActions>
-        <Button onClick={handleClose}>Cancel</Button>
-        <Button onClick={handleAccept} variant='contained'>
+        {fieldsWithError > 0 && loadComponent > 1 && (
+          <Typography variant='body1' color='error' sx={{ margitop: 1 }}>
+            Some fields are empty
+          </Typography>
+        )}
+        <Button variant='contained' color='error' onClick={handleClose}>
+          Cancel
+        </Button>
+        <Button onClick={validateForm} variant='contained' color='success'>
           Save
         </Button>
       </DialogActions>
     </CustomDialog>
   )
-}
-
-{
-  /* <TextField
-          label='Category Color'
-          name='color'
-          type='color'
-          fullWidth
-          multiline
-          value={form.color}
-          onChange={handleChange}
-          sx={{ '& input': { height: 50 } }}
-        /> */
 }

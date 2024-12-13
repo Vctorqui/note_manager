@@ -1,37 +1,9 @@
 import { createTheme, responsiveFontSizes } from '@mui/material/styles'
 
-// const colors = {
-//   primary: {
-//     main: '#EEE',
-//     light: '#1E3E62',
-//     dark: '',
-//   },
-//   secondary: {
-//     main: '#EEEEEE',
-//     light: '#EEEEEE',
-//   },
-//   text: {
-//     primary: '#EEEEEE',
-//     secondary: '#FF6500',
-//   },
-// }
-
 const theme = responsiveFontSizes(
   createTheme({
     palette: {
       mode: 'dark',
-      // primary: {
-      //   main: colors.primary.main,
-      //   light: colors.primary.light,
-      // },
-      // secondary: {
-      //   main: colors.secondary.main,
-      //   light: colors.secondary.light,
-      // },
-      // text: {
-      //   primary: colors.text.primary,
-      //   secondary: colors.text.secondary,
-      // },
     },
     typography: {
       button: {
@@ -72,7 +44,7 @@ const theme = responsiveFontSizes(
             alignItems: 'center',
             gap: '5px',
             height: '40px',
-            border: '2px solid #FF6500',
+            border: '2px solid #3B82F6',
             boxShadow: '4px 4px #323232',
             fontSize: '16px',
             fontWeight: 600,
@@ -89,7 +61,7 @@ const theme = responsiveFontSizes(
               left: '0',
               height: '100%',
               width: '0',
-              backgroundColor: '#FF6500',
+              backgroundColor: '#3B82F6',
               zIndex: -1,
               WebkitBoxShadow: '4px 8px 19px -3px rgba(0, 0, 0, 0.27)',
               boxShadow: '4px 8px 19px -3px rgba(0, 0, 0, 0.27)',
@@ -104,8 +76,8 @@ const theme = responsiveFontSizes(
             alignItems: 'center',
             gap: '5px',
             height: '40px',
-            border: '2px solid #FF6500',
-            backgroundColor: '#FF6500',
+            border: '2px solid #3B82F6',
+            backgroundColor: '#3B82F6',
             boxShadow: '4px 4px #323232',
             fontSize: '16px',
             fontWeight: 600,

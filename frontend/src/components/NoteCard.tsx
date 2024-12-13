@@ -38,7 +38,6 @@ export function NoteCard({ note, onDelete, onEdit, onArchive }: NoteCardProps) {
                 : (category as Category)
 
             if (!categoryObject) {
-              // Si no hay una categoría válida, no retorna nada (no muestra el Chip)
               return null
             }
 
@@ -76,14 +75,3 @@ export function NoteCard({ note, onDelete, onEdit, onArchive }: NoteCardProps) {
     </Card>
   )
 }
-
-// const label =
-//   typeof category === 'string'
-//     ? category
-//     : (category as Category).name // Verifica si es string o un objeto
-// const color =
-//   typeof category === 'string'
-//     ? category
-//     : (category as Category).color // Verifica si es string o un objeto
-
-// key={typeof category === 'string' ? category : category.name}

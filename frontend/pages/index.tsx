@@ -6,19 +6,23 @@ import {
   Box,
   Tabs,
   Tab,
-  // Chip,
   Grid2,
   Chip,
 } from '@mui/material'
-import { Add, Label } from '@mui/icons-material'
-import { deleteNote, getApiNotes, updateNote } from '@/services/notesService'
+import { Add, Delete, Label } from '@mui/icons-material'
+import {
+  deleteNote,
+  getApiNotes,
+  updateNote,
+} from '@/src/services/notesService'
 import { NoteCard } from '@/src/components/NoteCard'
 import { NoteDialog } from '@/src/components/NoteDialog'
-import { Category, Note } from '@/src/types/types'
+import { Note } from '@/src/types/types'
 import { enqueueSnackbar } from 'notistack'
-import { getApiCategories } from '@/services/categoryService'
 import { CategoryDialog } from '@/src/components/CategoryDialog'
 import { useStore } from '@/src/lib/store'
+import theme from '@/theme/theme'
+import { DeleteCategory } from '@/src/components/DeleteCategoryDialog'
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -45,19 +49,12 @@ function TabPanel(props: TabPanelProps) {
 export default function Home() {
   const [tabValue, setTabValue] = useState(0)
   const [createdNote, setCreatedNote] = useState<Note[]>([])
-  // const [createdCategories, setCreatedCategories] = useState<Category[]>([])
   const [openNoteDialog, setOpenNoteDialog] = useState(false)
-  const { categories, fetchCategories } = useStore()
-
   const [openCategoryDialog, setOpenCategoryDialog] = useState(false)
+  const [openDeleteCategory, setOpenDeleteCategory] = useState(false)
   const [editNote, setEditNote] = useState<Note | undefined>(undefined)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-
-  // async function getCategory() {
-  //   const categories = await getApiCategories()
-  //   console.log(categories)
-  //   setCreatedCategories(categories)
-  // }
+  const { categories, fetchCategories } = useStore()
 
   useEffect(() => {
     fetchCategories()
@@ -65,7 +62,6 @@ export default function Home() {
 
   async function getNotes() {
     const notes = await getApiNotes()
-    // console.log(notes)
     setCreatedNote(notes)
   }
 
@@ -87,7 +83,7 @@ export default function Home() {
 
   const handleOnDelete = async (id: string) => {
     try {
-      await deleteNote(id) // Simula el llamado a la API
+      await deleteNote(id)
       setCreatedNote((prevNotes) => prevNotes.filter((note) => note._id !== id))
       enqueueSnackbar('Note Deleted Successfully', { variant: 'success' })
     } catch (error) {
@@ -98,7 +94,7 @@ export default function Home() {
   async function handleArchive(id: string, note: Note) {
     try {
       const updatedNote = { ...note, isArchived: !note.isArchived }
-      await updateNote(id, updatedNote) // Asume que tienes esta función en la API
+      await updateNote(id, updatedNote)
       setCreatedNote((prevNotes) =>
         prevNotes.map((n) => (n._id === note._id ? updatedNote : n))
       )
@@ -147,12 +143,31 @@ export default function Home() {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
+          [theme.breakpoints.down('md')]: {
+            flexDirection: 'column',
+            gap: '20px',
+          },
         }}
       >
         <Typography variant='h4' component='h1'>
           Notes App
         </Typography>
-        <Box sx={{ display: 'flex', gap: 1 }}>
+        <Box
+          display={'flex'}
+          gap={1}
+          sx={{
+            [theme.breakpoints.down('sm')]: {
+              flexDirection: 'column',
+            },
+          }}
+        >
+          <Button
+            variant='outlined'
+            startIcon={<Delete />}
+            onClick={() => setOpenDeleteCategory(true)}
+          >
+            Delete Category
+          </Button>
           <Button
             variant='outlined'
             startIcon={<Label />}
@@ -236,11 +251,11 @@ export default function Home() {
         open={openNoteDialog}
         onClose={() => {
           setOpenNoteDialog(false)
-          setEditNote(undefined) // Limpia el estado de edición
+          setEditNote(undefined)
         }}
         onCreate={handleOnCreate}
         onUpdate={handleOnUpdate}
-        note={editNote} // Pasa la nota en edición
+        note={editNote}
       />
 
       <CategoryDialog
@@ -250,47 +265,13 @@ export default function Home() {
         }}
         onCreate={handleAddCategory}
       />
+
+      <DeleteCategory
+        open={openDeleteCategory}
+        onClose={() => {
+          setOpenDeleteCategory(false)
+        }}
+      />
     </Container>
   )
-}
-
-// const [isNoteDialogOpen, setIsNoteDialogOpen] = useState(false)
-// const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false)
-// const [selectedNote, setSelectedNote] = useState<Note | undefined>()
-// const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-
-// const activeNotes = notes.filter((note) => !note.isArchived)
-// const archivedNotes = notes.filter((note) => note.isArchived)
-
-// const filteredActiveNotes = selectedCategory
-//   ? activeNotes.filter((note) => note.categories.includes(selectedCategory))
-//   : activeNotes
-
-// const filteredArchivedNotes = selectedCategory
-//   ? archivedNotes.filter((note) => note.categories.includes(selectedCategory))
-//   : archivedNotes
-
-// const handleEditNote = (note: Note) => {
-//   setSelectedNote(note)
-//   setIsNoteDialogOpen(true)
-// }
-
-{
-  /* <Box sx={{ mb: 3, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-        <Chip
-          label='All'
-          onClick={() => {}}
-          color={selectedCategory === null ? 'primary' : 'default'}
-          variant={selectedCategory === null ? 'filled' : 'outlined'}
-        />
-        {categories.map((category) => (
-          <Chip
-            key={category.id}
-            label={category.name}
-            onClick={() => {}}
-            color={selectedCategory === category.id ? 'primary' : 'default'}
-            variant={selectedCategory === category.id ? 'filled' : 'outlined'}
-          />
-        ))}
-      </Box> */
 }

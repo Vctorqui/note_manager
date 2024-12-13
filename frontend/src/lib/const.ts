@@ -7,11 +7,6 @@ export const API_ENDPOINTS = {
   CATEGORIES: `${API_BASE_URL}/category`,
 } as const
 
-// export const loginFormInit: LoginData = {
-//   email: '',
-//   password: '',
-// }
-
 export const NoteInit: Note = {
   _id: '',
   title: '',
