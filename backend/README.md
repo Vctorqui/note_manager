@@ -28,6 +28,6 @@ To run this project, you will need to add the following environment variables to
 
 - `PORT` - 3001
 
-- `MONGODB_CONNECTION_URL` - mongodb+srv://shared-user:EKJjPpUnuh82wD7y@cluster0.cuwz1.mongodb.net/develop?retryWrites=true&w=majority&appName=Cluster0
+- `MONGODB_CONNECTION_URL` - mongodb+srv:your_mongodb_connection_url
 
 - `FRONTEND_URL` - http://localhost:3000
